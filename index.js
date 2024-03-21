@@ -30,24 +30,67 @@ app.set("view engine", "ejs");
 
 let todoArray = [];
 
+// Database Queries
+// When creatung to database you make use of .create({})
+// When YOY'RE TRYING TO RETRIEVE ALl Data from databse you use .find({})
+// When YOY'RE TRYING TO RETRIEVE Single Data from databse you use .findOne({})
+// When YOY'RE TRYING TO Delete Single Data from databse you use .findOneAndDelete || findByIdAndDelete({id})
+// When YOY'RE TRYING TO Update Single Data from databse you use .findOneAndUpdate || findByIdAndUpdate({id})
+// When YOY'RE TRYING TO Delete all Data from databse you use .deleteAll({})
+
 // Creating Todo
-app.post("/", (req, res) => {
+app.post("/", async (req, res) => {
   const { title, content } = req.body;
-  todoArray.push({ title, content });
-  console.log("Todo Array : ", todoArray);
+  if (!title || !content) {
+    return console.log("All fields are required");
+  }
+
+  try {
+    const todo = await TodoModel.create({
+      todoTitle: title,
+      todoContent: content,
+    });
+
+    if (todo) {
+      console.log("Todo Created Successfully");
+    } else {
+      console.log("Error Creating Todo");
+    }
+  } catch (error) {
+    console.log("Internal Server Error, Error Creating Todo", error);
+  }
   res.redirect("/");
 });
 
 // Retrieving all available Todo's
-app.get("/", (req, res) => {
-  res.render("index", { todoArray });
+app.get("/", async (req, res) => {
+  try {
+    const AllavailableTodo = await TodoModel.find({});
+    if (AllavailableTodo) {
+      console.log("Todo fetched Successfully", AllavailableTodo);
+      res.render("index", { todoArray: AllavailableTodo });
+    } else {
+      console.log("Error retrieving Todo's");
+    }
+  } catch (error) {
+    console.log("Server Error, Error fetching all todo's", error);
+  }
 });
 
 // Delete Todo
-app.post("/deleteTodo/:id", (req, res) => {
+app.post("/deleteTodo/:id", async (req, res) => {
   console.log("Delete ID : ", req.params.id);
-  let index = req.params.id;
-  todoArray.splice(index, 1);
+  let id = req.params.id;
+  try {
+    const deleteTodo = await TodoModel.findByIdAndDelete(id);
+    if (deleteTodo) {
+      console.log("Todo deleted successfully");
+    }else{
+      console.log("Error deleting todo")
+    }
+  } catch (error) {
+    console.log("Server Error, Error Deleting Todo", error);
+  }
 
   res.redirect("/");
 });
@@ -58,15 +101,15 @@ const connectDb = async () => {
     const connect = await mongoose.connect(connectionString);
     if (connect) {
       console.log("Database Conected Successfully");
-    }else{
-      console.log("Error Occured while trying to connect to the database ")
+    } else {
+      console.log("Error Occured while trying to connect to the database");
     }
   } catch (error) {
     console.log("Error Conecting to database : ", error);
   }
 };
 
-connectDb()
+connectDb();
 // Edit Todo
 app.post("/editTodo/:id", (req, res) => {
   const id = req.params.id;

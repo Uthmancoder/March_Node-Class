@@ -54,10 +54,10 @@
             %>
 
             <tr>
-              <td class="border p-2"><%= element.title %></td>
-              <td class="border p-2"><%= element.content %></td>
-              <td class="border p-2 d-flex align-items-center gap-3">
-                <form action="/deleteTodo/<%= index %>" method="post">
+              <td class="border p-2"><%= element.todoTitle %></td>
+              <td class="border p-2"><%= element.todoContent %></td>
+              <td class="border p-2 d-flex align-items-center gap-3"> 
+                <form action="/deleteTodo/<%= element._id %>" method="post">
                   <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
                 <form action="/editTodo/<%= index %>" method="post">
