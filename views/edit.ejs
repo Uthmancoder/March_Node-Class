@@ -16,7 +16,7 @@
         <h1 class="text-primary text-center">Update Todo</h1>
 
       <form
-        action="/updateTodo/<%= id %>"
+        action="/updateTodo/<%= todo._id %>"
         method="post"
         class="d-flex align-items-center gap-4 flex-column p-3 rounded-3 shadow col-10 col-md-8 col-lg-5 mx-auto"
       >
@@ -24,8 +24,8 @@
         <div class="w-100">
           <label for="title">Todo Title</label>
           <input
-            name="title"
-            value="<%= todo.title %>"
+            name="todoTitle"
+            value="<%= todo.todoTitle %>"
             type="text"
             placeholder="Add Todo Title"
             class="form-control w-100"
@@ -35,9 +35,9 @@
           <label for="content">Todo Content</label>
           
           <input
-            name="content"
+            name="todoContent"
             type="text"
-            value="<%= todo.content %>"
+            value="<%= todo.todoContent %>"
             placeholder="Add Todo Content"
             class="form-control w-100"
           />

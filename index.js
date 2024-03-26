@@ -16,6 +16,10 @@ const todoSchema = new mongoose.Schema({
     required: [true, "TodoTitle is required"],
     trim: true,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 // Set up a model for my application
@@ -37,6 +41,8 @@ let todoArray = [];
 // When YOY'RE TRYING TO Delete Single Data from databse you use .findOneAndDelete || findByIdAndDelete({id})
 // When YOY'RE TRYING TO Update Single Data from databse you use .findOneAndUpdate || findByIdAndUpdate({id})
 // When YOY'RE TRYING TO Delete all Data from databse you use .deleteAll({})
+
+// C R U D E OPERATION IN MONGOOSE
 
 // Creating Todo
 app.post("/", async (req, res) => {
@@ -85,8 +91,8 @@ app.post("/deleteTodo/:id", async (req, res) => {
     const deleteTodo = await TodoModel.findByIdAndDelete(id);
     if (deleteTodo) {
       console.log("Todo deleted successfully");
-    }else{
-      console.log("Error deleting todo")
+    } else {
+      console.log("Error deleting todo");
     }
   } catch (error) {
     console.log("Server Error, Error Deleting Todo", error);
@@ -111,36 +117,45 @@ const connectDb = async () => {
 
 connectDb();
 // Edit Todo
-app.post("/editTodo/:id", (req, res) => {
+app.post("/editTodo/:id", async (req, res) => {
   const id = req.params.id;
   console.log("Edit ID : ", id);
-
-  todoArray.filter((todo, index) => {
-    if (index == id) {
-      // res.render("edit", { todo, id });
-      console.log("Received TODO : ", todo);
-      res.render("edit", { todo, id });
+  try {
+    const getTodo = await TodoModel.findById(id);
+    if (getTodo) {
+      console.log("Received Todo : ", getTodo);
+      res.render("edit", { todo: getTodo });
     }
-  });
+  } catch (error) {
+    console.log("Server Error, Error Editing Todo", error);
+  }
 });
 
 // Update Todo
-app.post("/updateTodo/:id", (req, res) => {
-  const { title, content } = req.body;
-  console.log("Title : ", title, "Content : ", content);
-  if (!title || !content) {
+app.post("/updateTodo/:id", async (req, res) => {
+  const { todoTitle, todoContent } = req.body;
+  console.log("todoTitle : ", todoTitle, "todoContent : ", todoContent);
+  if (!todoTitle || !todoContent) {
     console.log("All fields are required");
   }
 
   const id = req.params.id;
   console.log("Update ID : ", id);
 
-  todoArray.filter((todo, index) => {
-    if (index == id) {
-      todo.title = title;
-      todo.content = content;
+  try {
+    const updateTodo = await TodoModel.findByIdAndUpdate(
+      id,
+      { todoTitle, todoContent },
+      { new: true }
+    );
+    if (updateTodo) {
+      console.log("Todo Updated Successfully");
+    } else {
+      console.log("Error Updating Todo");
     }
-  });
+  } catch (error) {
+    console.log("Server Error, Error Updating Todo", error);
+  }
   res.redirect("/");
 });
 
